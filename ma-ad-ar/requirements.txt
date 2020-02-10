@@ -1,0 +1,6 @@
+numpy==1.14.5
+sklearn
+pandas
+flask_cors
+flask
+pymongo
