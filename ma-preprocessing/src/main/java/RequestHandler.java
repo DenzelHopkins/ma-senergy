@@ -10,7 +10,7 @@ import org.json.JSONObject;
 import java.io.IOException;
 
 
-public class requestHandler {
+public class RequestHandler {
 
     String uri = "http://127.0.0.1:5000/";
     HttpPost post = new HttpPost(uri + "discovery");

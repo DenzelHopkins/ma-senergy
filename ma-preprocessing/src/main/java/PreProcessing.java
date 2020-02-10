@@ -9,7 +9,7 @@ import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
-public class preProcessing implements OperatorInterface {
+public class PreProcessing implements OperatorInterface {
 
     protected Stack<Message> segment;
     protected int windowSize;
@@ -18,35 +18,37 @@ public class preProcessing implements OperatorInterface {
     protected JSONObject jsonRequest;
 
 
-    protected String time_to_parse;
-    protected featureExtraction extraction;
+    protected LocalDateTime time;
+    protected FeatureExtraction extraction;
 
     protected JSONObject result;
 
-    public preProcessing() {
+    public PreProcessing() {
         segment = new Stack<>();
         windowSize = 120;
         amountOfMotionSensors = 3;
         jsonRequest = new JSONObject();
-        extraction = new featureExtraction(amountOfMotionSensors);
+        extraction = new FeatureExtraction(amountOfMotionSensors);
     }
 
     @Override
     public void run(Message message) {
 
-        Stack<String> times = new Stack<>();
-        times.add(message.getInput("timestamp1").getString());
-        times.add(message.getInput("timestamp2").getString());
-        times.add(message.getInput("timestamp3").getString());
+        // "1971-01-15T00:00:00+02:00"
+
+        Stack<LocalDateTime> times = new Stack<>();
+        times.add(LocalDateTime.parse(message.getInput("timestamp1").getString(), DateTimeFormatter.ISO_OFFSET_DATE_TIME));
+        times.add(LocalDateTime.parse(message.getInput("timestamp2").getString(), DateTimeFormatter.ISO_OFFSET_DATE_TIME));
+        times.add(LocalDateTime.parse(message.getInput("timestamp3").getString(), DateTimeFormatter.ISO_OFFSET_DATE_TIME));
 
         while(!times.isEmpty()){
-            if(time_to_parse.length() > 0){
+            if(time.toString().length() > 0){
                 break;
             }
-            time_to_parse = times.pop();
+            time = times.pop();
         }
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSSSS");
-        LocalDateTime time = LocalDateTime.parse(time_to_parse, formatter);
+
+        message.output("Time", time.toString());
 
         // Building Segments
         {

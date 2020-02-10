@@ -7,7 +7,7 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
-public class featureExtraction {
+public class FeatureExtraction {
 
     ArrayList<Double> feature;
     ArrayList<Double> motionSensors;
@@ -18,11 +18,11 @@ public class featureExtraction {
     int amountOfMotionSensors;
     int triggeredMotionSensors;
 
-    requestHandler requestHandler = new requestHandler();
+    RequestHandler requestHandler = new RequestHandler();
     JSONObject jsonRequest = new JSONObject();
 
 
-    public featureExtraction(int MotionSensors) {
+    public FeatureExtraction(int MotionSensors) {
 
          /* [Late night, Morning, Noon, Afternoon, Evening, Night,
             Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday,

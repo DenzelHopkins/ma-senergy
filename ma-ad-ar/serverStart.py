@@ -18,7 +18,6 @@ start_time = 0
 # 1 week
 trainings_duration = 604800000
 
-
 # 1 month
 # trainings_duration = 2628000000
 
