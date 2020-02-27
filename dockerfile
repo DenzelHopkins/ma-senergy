@@ -1,6 +1,6 @@
 FROM maven:3.6.1-jdk-8
 
-COPY ma-ad-ar /usr/src/app/python/
+COPY ma-ad-ar         /usr/src/app/python/
 COPY ma-preprocessing /usr/src/app/
 
 WORKDIR /usr/src/app/python

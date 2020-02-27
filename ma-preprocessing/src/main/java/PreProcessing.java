@@ -1,3 +1,4 @@
+import org.infai.seits.sepl.operators.Config;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.infai.seits.sepl.operators.Message;
 import org.infai.seits.sepl.operators.OperatorInterface;
@@ -17,7 +18,6 @@ public class PreProcessing implements OperatorInterface {
     protected int amountOfMotionSensors;
     protected JSONObject jsonRequest;
 
-
     protected LocalDateTime time;
     protected FeatureExtraction extraction;
 
@@ -34,24 +34,31 @@ public class PreProcessing implements OperatorInterface {
     @Override
     public void run(Message message) {
 
-        // "1971-01-15T00:00:00+02:00"
+        System.out.println("In Run Method!");
 
-        Stack<LocalDateTime> times = new Stack<>();
-        times.add(LocalDateTime.parse(message.getInput("timestamp1").getString(), DateTimeFormatter.ISO_OFFSET_DATE_TIME));
-        times.add(LocalDateTime.parse(message.getInput("timestamp2").getString(), DateTimeFormatter.ISO_OFFSET_DATE_TIME));
-        times.add(LocalDateTime.parse(message.getInput("timestamp3").getString(), DateTimeFormatter.ISO_OFFSET_DATE_TIME));
+        try {
+            System.out.println("This is valueOne " + message.getInput("valueOne").getString());
+            System.out.println("This is TimeStampOne " + message.getInput("timestampOne").getString());
 
-        while(!times.isEmpty()){
-            if(time.toString().length() > 0){
-                break;
+            RequestHandler request = new RequestHandler();
+            request.sayHello();
+
+            // "1971-01-15T00:00:00+02:00"
+            Stack<LocalDateTime> times = new Stack<>();
+            times.add(LocalDateTime.parse(message.getInput("timestampOne").getString(), DateTimeFormatter.ISO_OFFSET_DATE_TIME));
+//            times.add(LocalDateTime.parse(message.getInput("timestampTwo").getString(), DateTimeFormatter.ISO_OFFSET_DATE_TIME));
+//            times.add(LocalDateTime.parse(message.getInput("timestampThree").getString(), DateTimeFormatter.ISO_OFFSET_DATE_TIME));
+
+            while (!times.isEmpty()) {
+                if (time.toString().length() > 0) {
+                    break;
+                }
+                time = times.pop();
             }
-            time = times.pop();
-        }
 
-        message.output("Time", time.toString());
+            System.out.println("This is the segment time" + time.toString());
 
-        // Building Segments
-        {
+            // Building Segments
             if (segment.size() == 0) {
                 segment.add(message);
                 startTime = time;
@@ -59,22 +66,25 @@ public class PreProcessing implements OperatorInterface {
                 try {
                     result = extraction.run(segment, startTime);
 
-                    String result_time = result.getJSONObject("activityDiscovery").get("time").toString();
-                    String result_data = result.getJSONObject("activityDiscovery").get("data").toString();
-                    String result_label = result.getJSONObject("activityRecognition").get("label").toString();
+                    String resultTime = result.getJSONObject("activityDiscovery").get("time").toString();
+                    String resultData = result.getJSONObject("activityDiscovery").get("data").toString();
+                    String resultLabel = result.getJSONObject("activityRecognition").get("label").toString();
 
                     ObjectMapper mapper = new ObjectMapper();
-                    ArrayList data_array = mapper.readValue(result_data, ArrayList.class);
+                    ArrayList dataArray = mapper.readValue(resultData, ArrayList.class);
 
-                    message.output("Result_Time", result_time);
-                    message.output("Result_Data", result_data);
-                    message.output("Result_Label", result_label);
+//                    message.output("resultTime", resultTime);
+//                    message.output("resultData", resultData);
+//                    message.output("resultLabel", resultLabel);
 
-                    System.out.println(result_time);
-                    System.out.println(data_array);
-                    System.out.println(result_label);
+                    System.out.println(resultTime);
+                    System.out.println(dataArray);
+                    System.out.println(resultLabel);
 
                 } catch (IOException e) {
+                    System.err.println("Could not extract segment!");
+                    System.err.println("Skipping this message...");
+                    System.err.println(e.getMessage());
                     e.printStackTrace();
                 }
                 System.out.println(startTime);
@@ -84,17 +94,26 @@ public class PreProcessing implements OperatorInterface {
             } else {
                 segment.add(message);
             }
+        } catch (Exception e) {
+            System.err.println("Could not build segment!");
+            System.err.println("Skipping this message...");
+            System.err.println(e.getMessage());
+            e.printStackTrace();
         }
+
     }
 
     @Override
     public void config(Message message) {
-        message.addInput("value1");
-        message.addInput("value2");
-        message.addInput("value3");
-        message.addInput("timestamp1");
-        message.addInput("timestamp2");
-        message.addInput("timestamp3");
+        message.addInput("valueOne");
+//        message.addInput("valueTwo");
+//        message.addInput("valueThree");
+       message.addInput("timestampOne");
+//        message.addInput("timestampTwo");
+//        message.addInput("timestampThree");
+//        message.addInput("deviceOne");
+//        message.addInput("deviceTwo");
+//        message.addInput("deviceThree");
     }
 }
 

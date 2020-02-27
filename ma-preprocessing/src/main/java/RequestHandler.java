@@ -14,7 +14,7 @@ public class RequestHandler {
 
     String uri = "http://127.0.0.1:5000/";
     HttpPost post = new HttpPost(uri + "discovery");
-    HttpGet get = new HttpGet(uri + "solution");
+    HttpGet get = new HttpGet(uri + "test");
     StringEntity stringEntity;
 
     public JSONObject postSegment(JSONObject jsonRequest) throws IOException {
@@ -35,16 +35,14 @@ public class RequestHandler {
         return result;
     }
 
-    public void getSolutions() throws IOException {
+    public void sayHello() throws IOException {
         CloseableHttpClient httpClient = HttpClients.createDefault();
         try {
             CloseableHttpResponse response = httpClient.execute(get);
             try {
                 JSONObject result = new JSONObject(EntityUtils.toString(response.getEntity()));
-                String founded_activities = result.get("founded_activities").toString();
-                String accuracy = result.get("accuracy").toString();
-                System.out.println("Founded activities are: " + founded_activities);
-                System.out.println("Accuracy is: " + accuracy);
+                String answer = result.get("answer").toString();
+                System.out.println(answer);
             } finally {
                 response.close();
             }

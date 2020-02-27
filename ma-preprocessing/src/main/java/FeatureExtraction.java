@@ -46,9 +46,9 @@ public class FeatureExtraction {
             for (int i = 0; i < segment.size(); i++) {
                 m = segment.pop();
 
-                valueOne = m.getInput("value1").getString();
-                valueTwo = m.getInput("value2").getString();
-                valueThree = m.getInput("value3").getString();
+                valueOne = m.getInput("valueOne").getString();
+//                valueTwo = m.getInput("valueTwo").getString();
+//                valueThree = m.getInput("valueThree").getString();
 
                 if (i == 0) {
                     final String time_to_parse = m.getInput("timestamp").getString();
@@ -145,29 +145,29 @@ public class FeatureExtraction {
 
                 }
 
-                if (valueOne.equals("ON") && motionSensors.get(1 - 1) == 0.0) {
+                if ((valueOne.equals("ON")|| valueOne.equals("on")) && motionSensors.get(1 - 1) == 0.0) {
                     motionSensors.set(1 - 1, 1.0);
                     triggeredMotionSensors++;
-                } else if (valueOne.equals("OFF") && motionSensors.get(1 + amountOfMotionSensors - 1) == 0.0) {
+                } else if ((valueOne.equals("OFF")|| valueOne.equals("off")) && motionSensors.get(1 + amountOfMotionSensors - 1) == 0.0) {
                     motionSensors.set(1 + amountOfMotionSensors - 1, 1.0);
                     triggeredMotionSensors++;
                 }
 
-                if (valueTwo.equals("ON") && motionSensors.get(2 - 1) == 0.0) {
-                    motionSensors.set(2 - 1, 1.0);
-                    triggeredMotionSensors++;
-                } else if (valueTwo.equals("OFF") && motionSensors.get(2 + amountOfMotionSensors - 1) == 0.0) {
-                    motionSensors.set(2 + amountOfMotionSensors - 1, 1.0);
-                    triggeredMotionSensors++;
-                }
-
-                if (valueThree.equals("ON") && motionSensors.get(3 - 1) == 0.0) {
-                    motionSensors.set(3 - 1, 1.0);
-                    triggeredMotionSensors++;
-                } else if (valueThree.equals("OFF") && motionSensors.get(3 + amountOfMotionSensors - 1) == 0.0) {
-                    motionSensors.set(3 + amountOfMotionSensors - 1, 1.0);
-                    triggeredMotionSensors++;
-                }
+//                if (valueTwo.equals("ON") && motionSensors.get(2 - 1) == 0.0) {
+//                    motionSensors.set(2 - 1, 1.0);
+//                    triggeredMotionSensors++;
+//                } else if (valueTwo.equals("OFF") && motionSensors.get(2 + amountOfMotionSensors - 1) == 0.0) {
+//                    motionSensors.set(2 + amountOfMotionSensors - 1, 1.0);
+//                    triggeredMotionSensors++;
+//                }
+//
+//                if (valueThree.equals("ON") && motionSensors.get(3 - 1) == 0.0) {
+//                    motionSensors.set(3 - 1, 1.0);
+//                    triggeredMotionSensors++;
+//                } else if (valueThree.equals("OFF") && motionSensors.get(3 + amountOfMotionSensors - 1) == 0.0) {
+//                    motionSensors.set(3 + amountOfMotionSensors - 1, 1.0);
+//                    triggeredMotionSensors++;
+//                }
 
             }
 

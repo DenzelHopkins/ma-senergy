@@ -18,8 +18,14 @@ start_time = 0
 # 1 week
 trainings_duration = 604800000
 
+
 # 1 month
 # trainings_duration = 2628000000
+
+@app.route("/test", methods=["GET"])
+def test():
+    if request.method == "GET":
+        return jsonify({'answer': 'Server läuft!'})
 
 
 @app.route("/discovery", methods=["POST"])
