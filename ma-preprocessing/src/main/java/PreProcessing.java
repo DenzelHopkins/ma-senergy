@@ -26,7 +26,7 @@ public class PreProcessing implements OperatorInterface {
     public PreProcessing() {
         segment = new Stack<>();
         windowSize = 120;
-        amountOfMotionSensors = 3;
+        amountOfMotionSensors = 2;
         jsonRequest = new JSONObject();
         extraction = new FeatureExtraction(amountOfMotionSensors);
     }
@@ -35,70 +35,47 @@ public class PreProcessing implements OperatorInterface {
     public void run(Message message) {
 
         System.out.println("In Run Method!");
+        System.out.println("This is the message: " + message.getMessageString());
+        System.out.println("This is the value of device One: " + message.getInput("valueOne").getString());
+        System.out.println("This is the time of device One: " + message.getInput("timestampOne").getString());
+        System.out.println("This is the value of device Two: " + message.getInput("valueTwo").getString());
+        System.out.println("This is the time of device Two: " + message.getInput("timestampTwo").getString());
+//        System.out.println("This is the value of device Three: " + message.getInput("valueThree").getString());
+//        System.out.println("This is the time of device Three: " + message.getInput("timestampThree").getString());
 
         try {
-            System.out.println("This is valueOne " + message.getInput("valueOne").getString());
-            System.out.println("This is TimeStampOne " + message.getInput("timestampOne").getString());
-
-            RequestHandler request = new RequestHandler();
-            request.sayHello();
-
-            // "1971-01-15T00:00:00+02:00"
-            Stack<LocalDateTime> times = new Stack<>();
-            times.add(LocalDateTime.parse(message.getInput("timestampOne").getString(), DateTimeFormatter.ISO_OFFSET_DATE_TIME));
-//            times.add(LocalDateTime.parse(message.getInput("timestampTwo").getString(), DateTimeFormatter.ISO_OFFSET_DATE_TIME));
-//            times.add(LocalDateTime.parse(message.getInput("timestampThree").getString(), DateTimeFormatter.ISO_OFFSET_DATE_TIME));
-
-            while (!times.isEmpty()) {
-                if (time.toString().length() > 0) {
-                    break;
-                }
-                time = times.pop();
-            }
-
-            System.out.println("This is the segment time" + time.toString());
+            time = LocalDateTime.parse(message.getInput("timestampOne").getString(), DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"));
+            message.output("result", time.toString());
 
             // Building Segments
             if (segment.size() == 0) {
                 segment.add(message);
                 startTime = time;
-            } else if (Duration.between(startTime, time).getSeconds() > windowSize) {
+                System.out.println("----------------Segment begins----------------");
+                System.out.println("This is the StartTime: " + startTime.toString());
+            } else if (segment.size() == windowSize - 1) {
+                segment.add(message);
                 try {
                     result = extraction.run(segment, startTime);
-
-                    String resultTime = result.getJSONObject("activityDiscovery").get("time").toString();
                     String resultData = result.getJSONObject("activityDiscovery").get("data").toString();
-                    String resultLabel = result.getJSONObject("activityRecognition").get("label").toString();
-
                     ObjectMapper mapper = new ObjectMapper();
                     ArrayList dataArray = mapper.readValue(resultData, ArrayList.class);
-
-//                    message.output("resultTime", resultTime);
-//                    message.output("resultData", resultData);
-//                    message.output("resultLabel", resultLabel);
-
-                    System.out.println(resultTime);
-                    System.out.println(dataArray);
-                    System.out.println(resultLabel);
-
+                    System.out.println("SolutionTime: " + startTime.toString());
+                    System.out.println("SolutionData: " + dataArray.toString());
                 } catch (IOException e) {
-                    System.err.println("Could not extract segment!");
-                    System.err.println("Skipping this message...");
-                    System.err.println(e.getMessage());
-                    e.printStackTrace();
+                    System.out.println("Could not extract segment!");
+                    System.out.println("Skipping this message...");
+                    System.out.println(e);
                 }
-                System.out.println(startTime);
                 segment.clear();
-                segment.add(message);
-                startTime = time;
+                System.out.println("----------------Segment ends----------------");
             } else {
                 segment.add(message);
             }
         } catch (Exception e) {
-            System.err.println("Could not build segment!");
-            System.err.println("Skipping this message...");
-            System.err.println(e.getMessage());
-            e.printStackTrace();
+            System.out.println("Could not build segment!");
+            System.out.println("Skipping this message...");
+            System.out.println(e);
         }
 
     }
@@ -106,14 +83,12 @@ public class PreProcessing implements OperatorInterface {
     @Override
     public void config(Message message) {
         message.addInput("valueOne");
-//        message.addInput("valueTwo");
+        message.addInput("valueTwo");
 //        message.addInput("valueThree");
-       message.addInput("timestampOne");
-//        message.addInput("timestampTwo");
+        message.addInput("timestampOne");
+        message.addInput("timestampTwo");
 //        message.addInput("timestampThree");
-//        message.addInput("deviceOne");
-//        message.addInput("deviceTwo");
-//        message.addInput("deviceThree");
+
     }
 }
 

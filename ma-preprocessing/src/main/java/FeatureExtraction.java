@@ -45,15 +45,13 @@ public class FeatureExtraction {
         {
             for (int i = 0; i < segment.size(); i++) {
                 m = segment.pop();
-
                 valueOne = m.getInput("valueOne").getString();
-//                valueTwo = m.getInput("valueTwo").getString();
+                valueTwo = m.getInput("valueTwo").getString();
 //                valueThree = m.getInput("valueThree").getString();
 
                 if (i == 0) {
-                    final String time_to_parse = m.getInput("timestamp").getString();
-                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSSSS");
-                    LocalDateTime time = LocalDateTime.parse(time_to_parse, formatter);
+
+                    LocalDateTime time = startTime;
 
                     /*DayTimeFeature*/
                     switch (time.getHour()) {
@@ -145,46 +143,45 @@ public class FeatureExtraction {
 
                 }
 
-                if ((valueOne.equals("ON")|| valueOne.equals("on")) && motionSensors.get(1 - 1) == 0.0) {
-                    motionSensors.set(1 - 1, 1.0);
+                if ((valueOne.equals("ON") || valueOne.equals("on")) && motionSensors.get(0) == 0.0) {
+                    motionSensors.set(0, 1.0);
                     triggeredMotionSensors++;
-                } else if ((valueOne.equals("OFF")|| valueOne.equals("off")) && motionSensors.get(1 + amountOfMotionSensors - 1) == 0.0) {
+                } else if ((valueOne.equals("OFF") || valueOne.equals("off")) && motionSensors.get(1 + amountOfMotionSensors - 1) == 0.0) {
                     motionSensors.set(1 + amountOfMotionSensors - 1, 1.0);
                     triggeredMotionSensors++;
                 }
 
-//                if (valueTwo.equals("ON") && motionSensors.get(2 - 1) == 0.0) {
-//                    motionSensors.set(2 - 1, 1.0);
-//                    triggeredMotionSensors++;
-//                } else if (valueTwo.equals("OFF") && motionSensors.get(2 + amountOfMotionSensors - 1) == 0.0) {
-//                    motionSensors.set(2 + amountOfMotionSensors - 1, 1.0);
-//                    triggeredMotionSensors++;
-//                }
-//
-//                if (valueThree.equals("ON") && motionSensors.get(3 - 1) == 0.0) {
+                if ((valueTwo.equals("ON") || valueTwo.equals("on")) && motionSensors.get(2 - 1) == 0.0) {
+                    motionSensors.set(2 - 1, 1.0);
+                    triggeredMotionSensors++;
+                } else if ((valueTwo.equals("OFF") || valueTwo.equals("on")) && motionSensors.get(2 + amountOfMotionSensors - 1) == 0.0) {
+                    motionSensors.set(2 + amountOfMotionSensors - 1, 1.0);
+                    triggeredMotionSensors++;
+                }
+
+//                if ((valueThree.equals("ON") || valueThree.equals("on")) && motionSensors.get(3 - 1) == 0.0) {
 //                    motionSensors.set(3 - 1, 1.0);
 //                    triggeredMotionSensors++;
-//                } else if (valueThree.equals("OFF") && motionSensors.get(3 + amountOfMotionSensors - 1) == 0.0) {
+//                } else if ((valueThree.equals("OFF") || valueThree.equals("on")) && motionSensors.get(3 + amountOfMotionSensors - 1) == 0.0) {
 //                    motionSensors.set(3 + amountOfMotionSensors - 1, 1.0);
 //                    triggeredMotionSensors++;
 //                }
 
             }
 
-        feature.addAll(motionSensors);
-        //feature.add(triggeredMotionSensors); WIE normalisieren?
-        // mehr features???
+            feature.addAll(motionSensors);
+            //feature.add(triggeredMotionSensors); wie normalisieren?
+            // mehr features???
 
-        // add time feature
-        Date date = Date.from(startTime.atZone(ZoneId.systemDefault()).toInstant());
-        feature.add((double) date.getTime());
-    }
+            // add time feature
+            Date date = Date.from(startTime.atZone(ZoneId.systemDefault()).toInstant());
+            feature.add((double) date.getTime());
+        }
 
-    // http request to the server with the featureSegment and set answer to solution
-        jsonRequest.put("feature",feature);
+        // http request to the server with the featureSegment and set answer to solution
+        jsonRequest.put("feature", feature);
         return requestHandler.postSegment(jsonRequest);
-
-}
+    }
 }
 
 

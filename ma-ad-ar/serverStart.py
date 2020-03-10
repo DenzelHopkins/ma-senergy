@@ -48,27 +48,27 @@ def discovery():
         answer = {}
 
         # activity discovery
-        JsonAD = {}
+        jsonAD = {}
         answer_ad = cluster.cluster(data, time)
         if answer_ad:
             if diff > trainings_duration:
                 svm.train()
-            JsonAD['data'] = json.dumps(data.tolist())
-            JsonAD['time'] = time
+            jsonAD['data'] = json.dumps(data.tolist())
+            jsonAD['time'] = time
         else:
-            JsonAD['data'] = None
-            JsonAD['time'] = None
+            jsonAD['data'] = None
+            jsonAD['time'] = None
 
-        # activity recognition
-        JsonAR = {}
-        if svm.model is not None:
-            pred_label = svm.predict(data)
-            JsonAR['label'] = pred_label
-        else:
-            JsonAR['label'] = None
+        # # activity recognition
+        # jsonAR = {}
+        # if svm.model is not None:
+        #     pred_label = svm.predict(data)
+        #     jsonAR['label'] = pred_label
+        # else:
+        #     jsonAR['label'] = None
 
-        answer['activityDiscovery'] = JsonAD
-        answer['activityRecognition'] = JsonAR
+        answer['activityDiscovery'] = jsonAD
+        # answer['activityRecognition'] = jsonAR
 
         return answer
 
