@@ -12,15 +12,6 @@ cluster = activityDiscovery.OnlineCluster(11)
 svm = activityRecognition.SVM()
 CORS(app)
 
-set_start_time = False
-start_time = 0
-
-# 1 week
-trainings_duration = 604800000
-
-
-# 1 month
-# trainings_duration = 2628000000
 
 @app.route("/test", methods=["GET"])
 def test():
@@ -36,14 +27,6 @@ def discovery():
         time = data.iloc[-1]
         data = data[:-1]
 
-        # check if trainingstime passed or not
-        global set_start_time
-        global start_time
-        if set_start_time is not True:
-            start_time = time
-            set_start_time = True
-        diff = time - start_time
-
         # answer
         answer = {}
 
@@ -51,8 +34,7 @@ def discovery():
         jsonAD = {}
         answer_ad = cluster.cluster(data, time)
         if answer_ad:
-            if diff > trainings_duration:
-                svm.train()
+            svm.train()
             jsonAD['data'] = json.dumps(data.tolist())
             jsonAD['time'] = time
         else:

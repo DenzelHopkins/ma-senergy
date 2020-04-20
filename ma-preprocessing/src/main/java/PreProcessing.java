@@ -20,15 +20,19 @@ public class PreProcessing implements OperatorInterface {
 
     protected LocalDateTime time;
     protected FeatureExtraction extraction;
+    protected Segmentation segmentation;
+    protected List answer;
 
     protected JSONObject result;
 
+
     public PreProcessing() {
         segment = new Stack<>();
-        windowSize = 120;
+        windowSize = 9;
         amountOfMotionSensors = 2;
         jsonRequest = new JSONObject();
         extraction = new FeatureExtraction(amountOfMotionSensors);
+        segmentation = new Segmentation(windowSize);
     }
 
     @Override
@@ -36,25 +40,16 @@ public class PreProcessing implements OperatorInterface {
 
         System.out.println("In Run Method!");
         System.out.println("This is the message: " + message.getMessageString());
-        System.out.println("This is the value of device One: " + message.getInput("valueOne").getString());
-        System.out.println("This is the time of device One: " + message.getInput("timestampOne").getString());
-        System.out.println("This is the value of device Two: " + message.getInput("valueTwo").getString());
-        System.out.println("This is the time of device Two: " + message.getInput("timestampTwo").getString());
-//        System.out.println("This is the value of device Three: " + message.getInput("valueThree").getString());
-//        System.out.println("This is the time of device Three: " + message.getInput("timestampThree").getString());
+        System.out.println("This is the value of device One: " + message.getInput("value").getString());
+        System.out.println("This is the time of device One: " + message.getInput("time").getString());
 
         try {
-            time = LocalDateTime.parse(message.getInput("timestampOne").getString(), DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"));
             message.output("result", time.toString());
-
-            // Building Segments
-            if (segment.size() == 0) {
-                segment.add(message);
-                startTime = time;
-                System.out.println("----------------Segment begins----------------");
-                System.out.println("This is the StartTime: " + startTime.toString());
-            } else if (segment.size() == windowSize - 1) {
-                segment.add(message);
+            time = LocalDateTime.parse(message.getInput("time").getString(), DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"));
+            System.out.println("This is the current segment size: " + segment.size());
+            answer = segmentation.sensorEventBased(segment, message);
+            segment = (Stack) answer.get(1);
+            if ((Boolean)answer.get(0)){
                 try {
                     result = extraction.run(segment, startTime);
                     String resultData = result.getJSONObject("activityDiscovery").get("data").toString();
@@ -62,15 +57,15 @@ public class PreProcessing implements OperatorInterface {
                     ArrayList dataArray = mapper.readValue(resultData, ArrayList.class);
                     System.out.println("SolutionTime: " + startTime.toString());
                     System.out.println("SolutionData: " + dataArray.toString());
+
+                    segment.clear();
+                    segment.add(message);
+                    startTime = time;
+                    System.out.println("StartTime of the segment: "+ startTime.toString());
+
                 } catch (IOException e) {
-                    System.out.println("Could not extract segment!");
-                    System.out.println("Skipping this message...");
-                    System.out.println(e);
+                    e.printStackTrace();
                 }
-                segment.clear();
-                System.out.println("----------------Segment ends----------------");
-            } else {
-                segment.add(message);
             }
         } catch (Exception e) {
             System.out.println("Could not build segment!");
@@ -82,13 +77,8 @@ public class PreProcessing implements OperatorInterface {
 
     @Override
     public void config(Message message) {
-        message.addInput("valueOne");
-        message.addInput("valueTwo");
-//        message.addInput("valueThree");
-        message.addInput("timestampOne");
-        message.addInput("timestampTwo");
-//        message.addInput("timestampThree");
-
+        message.addInput("value");
+        message.addInput("time");
     }
 }
 
