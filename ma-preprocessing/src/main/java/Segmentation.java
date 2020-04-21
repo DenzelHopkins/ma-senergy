@@ -1,4 +1,4 @@
-import org.infai.seits.sepl.operators.Message;
+import org.infai.ses.senergy.operators.Message;
 
 import java.util.Arrays;
 import java.util.List;
