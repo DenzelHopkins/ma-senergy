@@ -1,8 +1,6 @@
-import org.infai.seits.sepl.operators.Config;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.infai.seits.sepl.operators.Message;
-import org.infai.seits.sepl.operators.OperatorInterface;
-
+import org.infai.ses.senergy.operators.Message;
+import org.infai.ses.senergy.operators.OperatorInterface;
 import org.json.JSONObject;
 
 import java.io.IOException;
@@ -76,7 +74,7 @@ public class PreProcessing implements OperatorInterface {
     }
 
     @Override
-    public void config(Message message) {
+    public void configMessage(Message message) {
         message.addInput("value");
         message.addInput("time");
     }

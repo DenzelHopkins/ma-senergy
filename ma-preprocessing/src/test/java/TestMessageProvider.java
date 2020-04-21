@@ -1,5 +1,5 @@
-import org.infai.seits.sepl.operators.Builder;
-import org.infai.seits.sepl.operators.Message;
+import org.infai.ses.senergy.operators.Builder;
+import org.infai.ses.senergy.operators.Message;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
