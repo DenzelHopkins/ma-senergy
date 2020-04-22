@@ -11,12 +11,11 @@ public class FeatureExtraction {
 
     ArrayList<Double> feature;
     ArrayList<Double> motionSensors;
-    Message m;
+    JSONObject m;
     String value;
     int amountOfMotionSensors;
     int triggeredMotionSensors;
 
-    RequestHandler requestHandler = new RequestHandler();
     JSONObject jsonRequest = new JSONObject();
 
 
@@ -33,7 +32,7 @@ public class FeatureExtraction {
 
     }
 
-    public JSONObject run(Stack<Message> segment, LocalDateTime startTime) throws IOException {
+    public JSONObject run(Stack<JSONObject> segment, LocalDateTime startTime, Boolean training) throws IOException {
 
         feature.clear();
         motionSensors = new ArrayList<>(Collections.nCopies(amountOfMotionSensors * 2, 0.0)); /*[M001ON, M002ON, ... , M031OFF, MO32OFF]*/
@@ -43,8 +42,7 @@ public class FeatureExtraction {
         {
             for (int i = 0; i < segment.size(); i++) {
                 m = segment.pop();
-                value = m.getInput("value").getString();
-
+                value = m.getString("level");
                 if (i == 0) {
 
                     LocalDateTime time = startTime;
@@ -90,53 +88,6 @@ public class FeatureExtraction {
                         default:
                             feature.addAll(Arrays.asList(0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
                     }
-
-                    /*DayOfWeek*/
-                    switch (time.getDayOfWeek()) {
-                        case MONDAY:
-                            feature.addAll(Arrays.asList(1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
-                            break;
-                        case TUESDAY:
-                            feature.addAll(Arrays.asList(0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0));
-                            break;
-                        case WEDNESDAY:
-                            feature.addAll(Arrays.asList(0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0));
-                            break;
-                        case THURSDAY:
-                            feature.addAll(Arrays.asList(0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0));
-                            break;
-                        case FRIDAY:
-                            feature.addAll(Arrays.asList(0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0));
-                            break;
-                        case SATURDAY:
-                            feature.addAll(Arrays.asList(0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0));
-                            break;
-                        case SUNDAY:
-                            feature.addAll(Arrays.asList(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0));
-                            break;
-                        default:
-                            System.out.println("--------------------NO WEEKDAY SET ");
-                            feature.addAll(Arrays.asList(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
-                    }
-
-                    /*WeekendOrNot*/
-                    switch (time.getDayOfWeek()) {
-                        case MONDAY:
-                        case TUESDAY:
-                        case WEDNESDAY:
-                        case THURSDAY:
-                            feature.addAll(Arrays.asList(1.0, 0.0));
-                            break;
-                        case FRIDAY:
-                        case SATURDAY:
-                        case SUNDAY:
-                            feature.addAll(Arrays.asList(0.0, 1.0));
-                            break;
-                        default:
-                            System.out.println("--------------------NO WEEKEND SET ");
-                            feature.addAll(Arrays.asList(0.0, 0.0));
-                    }
-
                 }
 
                 if ((value.equals("ON") || value.equals("on")) && motionSensors.get(0) == 0.0) {
@@ -157,7 +108,8 @@ public class FeatureExtraction {
 
         // http request to the server with the featureSegment and set answer to solution
         jsonRequest.put("feature", feature);
-        return requestHandler.postSegment(jsonRequest);
+        jsonRequest.put("training", training);
+        return jsonRequest;
     }
 }
 

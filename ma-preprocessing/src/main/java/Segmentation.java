@@ -1,4 +1,5 @@
 import org.infai.ses.senergy.operators.Message;
+import org.json.JSONObject;
 
 import java.util.Arrays;
 import java.util.List;
@@ -14,9 +15,9 @@ public class Segmentation {
         this.currentActivity = "";
     }
 
-    public List<Object> sensorEventBased(Stack<Message> segment, Message message) {
+    public List<Object> sensorEventBased(Stack<JSONObject> segment, JSONObject json) {
         if (segment.size() < windowSize) {
-            segment.add(message);
+            segment.add(json);
             return Arrays.asList(false, segment);
         } else if (segment.size() == windowSize) {
             return Arrays.asList(true, segment);
