@@ -14,7 +14,6 @@ public class FeatureExtraction {
     JSONObject m;
     String value;
     int amountOfMotionSensors;
-    int triggeredMotionSensors;
 
     JSONObject jsonRequest = new JSONObject();
 
@@ -36,7 +35,6 @@ public class FeatureExtraction {
 
         feature.clear();
         motionSensors = new ArrayList<>(Collections.nCopies(amountOfMotionSensors * 2, 0.0)); /*[M001ON, M002ON, ... , M031OFF, MO32OFF]*/
-        triggeredMotionSensors = 0;
 
         // building featureSegment
         {
@@ -92,10 +90,8 @@ public class FeatureExtraction {
 
                 if ((value.equals("ON") || value.equals("on")) && motionSensors.get(0) == 0.0) {
                     motionSensors.set(0, 1.0);
-                    triggeredMotionSensors++;
                 } else if ((value.equals("OFF") || value.equals("off")) && motionSensors.get(1 + amountOfMotionSensors - 1) == 0.0) {
-                    motionSensors.set(1 + amountOfMotionSensors - 1, 1.0);
-                    triggeredMotionSensors++;
+                    motionSensors.set(amountOfMotionSensors, 1.0);
                 }
             }
 

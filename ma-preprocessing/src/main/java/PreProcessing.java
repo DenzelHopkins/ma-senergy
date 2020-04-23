@@ -31,8 +31,8 @@ public class PreProcessing implements OperatorInterface {
 
     public PreProcessing() {
         segment = new Stack<>();
-        windowSize = 3;
-        amountOfMotionSensors = 2;
+        windowSize = 2;
+        amountOfMotionSensors = 3;
         training = true;
         trainingDuration = 50;
         trainingCounter = 0;
