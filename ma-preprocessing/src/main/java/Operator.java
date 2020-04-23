@@ -6,7 +6,6 @@ public class Operator {
         try{
             Stream stream  = new Stream();
             PreProcessing preProcessing = new PreProcessing();
-            System.out.println("In Main Method!");
             stream.start(preProcessing);
         } catch (Exception e ){
             System.out.println(e);
