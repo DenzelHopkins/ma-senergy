@@ -5,9 +5,8 @@ public class Operator {
     public static void main(String[] args) {
         try{
             Stream stream  = new Stream();
-            PreProcessing preProcessing = new PreProcessing();
-            System.out.println("In Main Method!");
-            stream.start(preProcessing);
+            Processing processing = new Processing();
+            stream.start(processing);
         } catch (Exception e ){
             System.out.println(e);
         }

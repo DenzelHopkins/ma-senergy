@@ -1,7 +1,5 @@
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.infai.ses.senergy.operators.Message;
 import org.infai.ses.senergy.operators.OperatorInterface;
-import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.IOException;
@@ -9,7 +7,7 @@ import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
-public class PreProcessing implements OperatorInterface {
+public class Processing implements OperatorInterface {
 
     protected int windowSize;
     protected int amountOfMotionSensors;
@@ -29,7 +27,7 @@ public class PreProcessing implements OperatorInterface {
     protected JSONObject activities;
 
 
-    public PreProcessing() {
+    public Processing() {
         segment = new Stack<>();
         windowSize = 2;
         amountOfMotionSensors = 3;
@@ -45,19 +43,15 @@ public class PreProcessing implements OperatorInterface {
     @Override
     public void run(Message message) {
 
-        // System.out.println("This is the message: " + message.getMessageString());
-
+        /* Get values of the message */
         org.json.simple.JSONArray jsonArray = message.getValue("inputs");
         org.json.simple.JSONObject inputs = (org.json.simple.JSONObject) jsonArray.get(0);
         org.json.simple.JSONObject value = (org.json.simple.JSONObject) inputs.get("value");
         org.json.simple.JSONObject tamper = (org.json.simple.JSONObject) value.get("tamper");
-
         String level = tamper.get("level").toString();
         String updateTime = tamper.get("updateTime").toString();
         String device_id = inputs.get("device_id").toString();
-
         JSONObject json = new JSONObject().put("level", level).put("updateTime", updateTime).put("device_id", device_id);
-        // System.out.println("This is the json-object: " + json.toString());
 
         try {
             message.output("result", "result");
@@ -73,7 +67,7 @@ public class PreProcessing implements OperatorInterface {
                 System.out.println("This is the current segment size: " + segment.size());
             }
 
-            /* Training or not */
+            /* Check if training or not */
             trainingCounter += 1;
             if (trainingCounter > trainingDuration) {
                 training = false;

@@ -5,7 +5,7 @@ import java.util.List;
 public class TestPreprocessing {
 
     public void run() throws Exception {
-        PreProcessing pre = new PreProcessing();
+        Processing pre = new Processing();
         List<Message> messages = TestMessageProvider.getTestMesssagesSet();
         int data_size = messages.size();
         for (int i = 0; i < data_size; i++) {

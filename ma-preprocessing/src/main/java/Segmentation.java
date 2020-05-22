@@ -15,6 +15,7 @@ public class Segmentation {
         this.currentActivity = "";
     }
 
+    /* Sensor Based Segmentation */
     public List<Object> sensorEventBased(Stack<JSONObject> segment, JSONObject json) {
         if (segment.size() < windowSize) {
             segment.add(json);
