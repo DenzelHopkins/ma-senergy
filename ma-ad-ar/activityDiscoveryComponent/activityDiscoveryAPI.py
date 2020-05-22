@@ -1,4 +1,4 @@
-from src.activityDiscoveryComponent import outlierDetection, onlineClustering
+from activityDiscoveryComponent import outlierDetection, onlineClustering
 
 
 class activityDiscovery(object):

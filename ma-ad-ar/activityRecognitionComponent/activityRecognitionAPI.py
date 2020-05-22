@@ -1,4 +1,4 @@
-from src.activityRecognitionComponent import supportVectorMachine
+from activityRecognitionComponent import supportVectorMachine
 
 
 class activityRecognition(object):

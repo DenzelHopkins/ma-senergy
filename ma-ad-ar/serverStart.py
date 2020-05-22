@@ -1,19 +1,13 @@
-import json
-
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 import pandas as pd
 
-from src.activityRecognitionComponent import activityRecognitionAPI
-from src.activityDiscoveryComponent import activityDiscoveryAPI
-from src import databaseAPI, annotation
-
-import activityDiscovery
-import activityRecognition
+from activityRecognitionComponent import activityRecognitionAPI
+from activityDiscoveryComponent import activityDiscoveryAPI
+import databaseAPI
+import annotation
 
 app = Flask(__name__)
-cluster = activityDiscovery.OnlineCluster(11)
-svm = activityRecognition.SVM()
 CORS(app)
 
 # Initialize components
@@ -49,7 +43,6 @@ def discovery():
         resultActivityDiscovery = activityDiscovery.discover(dataPoint, database, label, time)
         if resultActivityDiscovery:
             answer['discoveredActivity'] = resultActivityDiscovery
-            print(resultActivityDiscovery)
             if not training:
                 activityRecognition.trainModel(database)
         if not training:

@@ -43,7 +43,12 @@ public class Processing implements OperatorInterface {
     @Override
     public void run(Message message) {
 
+<<<<<<< HEAD:ma-preprocessing/src/main/java/Processing.java
         /* Get values of the message */
+=======
+        System.out.println("This is the message: " + message.getMessageString());
+
+>>>>>>> 65f2c2b55537bd7ab215da26fa2a1af295c95db7:ma-preprocessing/src/main/java/PreProcessing.java
         org.json.simple.JSONArray jsonArray = message.getValue("inputs");
         org.json.simple.JSONObject inputs = (org.json.simple.JSONObject) jsonArray.get(0);
         org.json.simple.JSONObject value = (org.json.simple.JSONObject) inputs.get("value");
@@ -54,7 +59,6 @@ public class Processing implements OperatorInterface {
         JSONObject json = new JSONObject().put("level", level).put("updateTime", updateTime).put("device_id", device_id);
 
         try {
-            message.output("result", "result");
 
             /* Get time of the message */
             timeToParse = json.getString("updateTime");
@@ -64,7 +68,6 @@ public class Processing implements OperatorInterface {
             /* Check if segment size is null or not to set segmentTime */
             if (segment.size() == 0){
                 segmentTime = time;
-                System.out.println("This is the current segment size: " + segment.size());
             }
 
             /* Check if training or not */
@@ -83,17 +86,12 @@ public class Processing implements OperatorInterface {
                     /* Extract features */
                     jsonRequest = extraction.run(segment, segmentTime, training);
 
-                    System.out.println("This is the jsonRequest to the server: " + jsonRequest.toString());
-
                     /* Send dataPoint to the server */
                     activities = requestHandler.analyseDataPoint(jsonRequest);
 
                     /* Recognized and discovered activity */
-                    System.out.println("This is the recognized activity: " +
-                            activities.getString("recognizedActivity") +
-                            (" and this is the discoveredActivity: ") +
-                            activities.getString("discoveredActivity")
-                    );
+                    message.output("discoveredActivity", activities.getString("discoveredActivity"));
+                    message.output("recognizedActivity",  activities.getString("recognizedActivity"));
 
                     /* Clear the segment, add current message and set startTime of the new segment */
                     segment.clear();
