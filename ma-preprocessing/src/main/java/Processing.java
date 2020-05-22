@@ -43,12 +43,7 @@ public class Processing implements OperatorInterface {
     @Override
     public void run(Message message) {
 
-<<<<<<< HEAD:ma-preprocessing/src/main/java/Processing.java
         /* Get values of the message */
-=======
-        System.out.println("This is the message: " + message.getMessageString());
-
->>>>>>> 65f2c2b55537bd7ab215da26fa2a1af295c95db7:ma-preprocessing/src/main/java/PreProcessing.java
         org.json.simple.JSONArray jsonArray = message.getValue("inputs");
         org.json.simple.JSONObject inputs = (org.json.simple.JSONObject) jsonArray.get(0);
         org.json.simple.JSONObject value = (org.json.simple.JSONObject) inputs.get("value");

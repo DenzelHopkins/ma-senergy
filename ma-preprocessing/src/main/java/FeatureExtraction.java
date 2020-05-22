@@ -1,10 +1,7 @@
-import org.infai.ses.senergy.operators.Message;
 import org.json.JSONObject;
-
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 public class FeatureExtraction {
@@ -33,10 +30,13 @@ public class FeatureExtraction {
 
     public JSONObject run(Stack<JSONObject> segment, LocalDateTime startTime, Boolean training) throws IOException {
 
+        /* Clear the last feature vector */
         feature.clear();
+
+        /* Array with triggered motionSensors [M001ON, M002ON, ... , M031OFF, MO32OFF]*/
         motionSensors = new ArrayList<>(Collections.nCopies(amountOfMotionSensors * 2, 0.0)); /*[M001ON, M002ON, ... , M031OFF, MO32OFF]*/
 
-        // building featureSegment
+        /* Extract featureVector */
         {
             for (int i = 0; i < segment.size(); i++) {
                 m = segment.pop();
@@ -45,7 +45,7 @@ public class FeatureExtraction {
 
                     LocalDateTime time = startTime;
 
-                    /*DayTimeFeature*/
+                    /* Set dayTime feature */
                     switch (time.getHour()) {
                         case 1:
                         case 2:
@@ -88,23 +88,25 @@ public class FeatureExtraction {
                     }
                 }
 
+                /* MotionSensor is triggered or not */
                 if ((value.equals("ON") || value.equals("on")) && motionSensors.get(0) == 0.0) {
                     motionSensors.set(0, 1.0);
                 } else if ((value.equals("OFF") || value.equals("off")) && motionSensors.get(1 + amountOfMotionSensors - 1) == 0.0) {
                     motionSensors.set(amountOfMotionSensors, 1.0);
                 }
             }
-
+            /* Adding motions features */
             feature.addAll(motionSensors);
 
-            // add time feature
+            /* Add time feature */
             Date date = Date.from(startTime.atZone(ZoneId.systemDefault()).toInstant());
             feature.add((double) date.getTime());
         }
 
-        // http request to the server with the featureSegment and set answer to solution
+        /* HTTP request to the server with the featureSegment */
         jsonRequest.put("feature", feature);
         jsonRequest.put("training", training);
+
         return jsonRequest;
     }
 }
