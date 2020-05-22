@@ -2,6 +2,7 @@ import string
 import numpy as np
 
 
+# Annotate dataPoint
 def labelDataPoint(dataPoint):
     label = ''
     result = np.where(dataPoint == 1)
@@ -9,5 +10,3 @@ def labelDataPoint(dataPoint):
     for x in result[0]:
         label = label + alphabet[x]
     return label
-
-

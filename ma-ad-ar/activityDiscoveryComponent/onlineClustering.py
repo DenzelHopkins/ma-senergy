@@ -1,44 +1,19 @@
 import heapq
 import math
-import numpy as np
 import operator
-
 import scipy
 
-memoryDelta = 604800000  # cluster sollen nach einer Woche Inaktivität gelöscht werden (in Millisekunden)
+# Delete cluster after one week inactivity
+memoryDelta = 604800000
 
 
+# Measure distance between two dataPoints
 def kernel_gauss(a, b, sigma=0.1):
     v = a - b
     return math.exp(-sigma * (math.sqrt(scipy.square(v).sum()) ** 2))
 
 
-class OnlineVariance(object):
-    """
-    Welford's algorithm computes the sample variance incrementally.
-    """
-
-    def __init__(self, iterable=None, ddof=1):
-        self.ddof, self.n, self.mean, self.M2, self.std = ddof, 0, 0.0, 0.0, 0.0
-
-    def std_calc(self, datum):
-        self.n += 1
-        self.delta = datum - self.mean
-        self.mean += self.delta / self.n
-        self.M2 += self.delta * (datum - self.mean)
-        self.variance = self.M2 / (self.n - self.ddof)
-        self.std = np.sqrt(self.variance)
-
-    def merge_std(self, new):
-        n_mean = (self.n * self.mean + new.n * new.mean) / (self.n + new.n)
-        self.variance = (self.n * self.std * self.std + new.n * new.std * new.std + self.n * (self.mean - n_mean) * (
-                self.mean - n_mean) + new.n * (new.mean - n_mean) * (new.mean - n_mean)) / (self.n + new.n)
-        self.std = np.sqrt(self.variance)
-        self.M2 = self.variance * (self.n + new.n - self.ddof)
-        self.n += new.n
-        self.mean = n_mean
-
-
+# Class for a cluster
 class Cluster(object):
     def __init__(self, segment, time):
         self.center = segment
@@ -48,8 +23,6 @@ class Cluster(object):
         self.firstPoint = segment
         self.endPoint = segment
         self.num_points = 1
-        self.STD = OnlineVariance(ddof=0)
-        self.STD.std_calc(kernel_gauss(segment, segment))
 
     def add(self, segment, time):
         self.size += kernel_gauss(self.center, segment)
@@ -57,20 +30,16 @@ class Cluster(object):
         self.timestampEnd = time
         self.endPoint = segment
         self.num_points += 1
-        self.STD.std_calc(kernel_gauss(self.center, segment))
 
     def merge(self, c):
         self.center = (self.center * self.size + c.center * c.size) / (self.size + c.size)
         self.size += c.size
         self.num_points += c.num_points
         self.num_points -= 1
-        self.STD.merge_std(c.STD)
 
 
+# Class for the distances
 class Distance(object):
-    """this is just a tuple,
-    but we need an object so we can define cmp for heapq"""
-
     def __init__(self, x, y, d):
         self.x = x
         self.y = y
@@ -83,6 +52,7 @@ class Distance(object):
         return "Dist(%f)" % self.d
 
 
+# Class for the OnlineClustering
 class OnlineCluster(object):
     def __init__(self, N):
         self.currentClusters = []
@@ -94,14 +64,14 @@ class OnlineCluster(object):
 
     def cluster(self, segment, time):
 
-        # delete old cluster (depends on memoryDelta)
+        # Delete old cluster (depends on memoryDelta)
         for clusterI in self.currentClusters:
             if (time + 1) - clusterI.timestampEnd >= memoryDelta:
                 self.currentClusters.remove(clusterI)
                 self.removeDistance(clusterI)
                 self.allClusters.append(clusterI)
 
-        # find the closest cluster
+        # Find the closest cluster
         if len(self.currentClusters) > 0:
             closestArray = [(i, kernel_gauss(c.center, segment)) for i, c in enumerate(self.currentClusters)]
             closest = self.currentClusters[max(closestArray, key=operator.itemgetter(1))[0]]
@@ -114,7 +84,7 @@ class OnlineCluster(object):
                     self.allClusters.append(closest)
                     return closest.center
 
-        # delete one cluster when there are to many
+        # Delete one cluster when there are to many
         if len(self.currentClusters) > self.N:
             m = heapq.heappop(self.distanceClusters)
             self.currentClusters.remove(m.y)
@@ -122,14 +92,14 @@ class OnlineCluster(object):
             m.x.merge(m.y)
             self.updateDistance(m.x)
 
-        # make a new cluster for the current segment
+        # Make a new cluster for the current segment
         newCluster = Cluster(segment, time)
         self.currentClusters.append(newCluster)
         self.updateDistance(newCluster)
         self.n += 1
 
+    # Delete a current cluster
     def removeDistance(self, c):
-        """invalidate intercluster distance cache for c"""
         r = []
         for h in self.distanceClusters:
             if h.x == c or h.y == c:
@@ -138,10 +108,9 @@ class OnlineCluster(object):
             self.distanceClusters.remove(h)
             heapq.heapify(self.distanceClusters)
 
+    # Update distances between all clusters
     def updateDistance(self, c):
-        """Cluster c has changed, re-compute all intercluster distances"""
         self.removeDistance(c)
-
         for x in self.currentClusters:
             if x == c:
                 continue

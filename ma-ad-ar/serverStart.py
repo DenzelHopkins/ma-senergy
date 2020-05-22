@@ -39,7 +39,7 @@ def discovery():
         # Annotate dataPoint
         label = annotation.labelDataPoint(dataPoint)
 
-        # When use the integrated system
+        # Use the integrated system
         resultActivityDiscovery = activityDiscovery.discover(dataPoint, database, label, time)
         if resultActivityDiscovery:
             answer['discoveredActivity'] = resultActivityDiscovery

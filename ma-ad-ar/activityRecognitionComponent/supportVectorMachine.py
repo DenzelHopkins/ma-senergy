@@ -1,6 +1,8 @@
 import numpy as np
 from sklearn import svm
 
+
+# Class for the support-vector-machine
 class SVM(object):
     def __init__(self):
         self.labels = ["Meal_Preparation",

@@ -1,9 +1,7 @@
 import numpy as np
-import pymongo
-from pymongo import MongoClient
-from sklearn.utils import shuffle
 
 
+# Class to hold and read annotated dataPoints
 class database(object):
 
     def __init__(self):
